@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>侯家义的三幕奇遇</title>
+  <style>
+    :root {
+      --ink: #f7f3e8;
+      --muted: #cfd8dc;
+      --panel: rgba(12, 18, 24, 0.82);
+      --panel-strong: rgba(10, 14, 18, 0.92);
+      --gold: #f4c95d;
+      --teal: #74d3c7;
+      --rose: #ff8a9a;
+      --line: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      color: var(--ink);
+      background: #10151b;
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-height: 540px;
+      overflow: hidden;
+      background: #10151b;
+    }
+
+    .background {
+      position: absolute;
+      inset: 0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.03);
+      transition: background-image 500ms ease, filter 500ms ease, transform 600ms ease;
+      filter: saturate(1.06) contrast(1.02);
+    }
+
+    .shade {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(4, 9, 14, 0.55), rgba(4, 9, 14, 0.1) 42%, rgba(4, 9, 14, 0.62)),
+        linear-gradient(180deg, rgba(4, 9, 14, 0.12), rgba(4, 9, 14, 0.7));
+      pointer-events: none;
+    }
+
+    .character-wrap {
+      position: absolute;
+      inset: 60px 0 130px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .character {
+      max-width: min(52vw, 520px);
+      max-height: 74vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42);
+      transition: opacity 260ms ease, transform 360ms ease, filter 360ms ease;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.42));
+    }
+
+    .character.left {
+      transform: translateX(-16vw) scale(0.9);
+    }
+
+    .character.right {
+      transform: translateX(16vw) scale(0.92);
+    }
+
+    .character.close {
+      max-width: min(62vw, 620px);
+      transform: translateY(18px) scale(1.02);
+    }
+
+    .hud {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 4;
+    }
+
+    .chapter {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 14, 18, 0.62);
+      backdrop-filter: blur(12px);
+      letter-spacing: 0;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .stat {
+      min-width: 84px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 14, 18, 0.62);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .stat strong {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .dialogue {
+      position: absolute;
+      left: clamp(14px, 4vw, 56px);
+      right: clamp(14px, 4vw, 56px);
+      bottom: clamp(14px, 4vh, 34px);
+      z-index: 5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 54px rgba(0, 0, 0, 0.34);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .speaker {
+      display: inline-flex;
+      min-width: 130px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      background: linear-gradient(90deg, rgba(244, 201, 93, 0.95), rgba(116, 211, 199, 0.92));
+      color: #142026;
+      font-weight: 900;
+    }
+
+    .text {
+      min-height: 92px;
+      padding: 18px 22px 14px;
+      font-size: clamp(17px, 2.2vw, 22px);
+      line-height: 1.65;
+    }
+
+    .dialogue-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 18px 16px 22px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .next {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .next:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(2px);
+    }
+
+    .choices {
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    .choice {
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      text-align: left;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .choice:hover {
+      transform: translateY(-2px);
+      border-color: rgba(244, 201, 93, 0.72);
+      background: rgba(244, 201, 93, 0.18);
+    }
+
+    .menu,
+    .ending {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 26px;
+      background:
+        linear-gradient(180deg, rgba(6, 10, 14, 0.18), rgba(6, 10, 14, 0.86)),
+        url("150029-1779001229315a.jpg") center / cover;
+    }
+
+    .menu-panel,
+    .ending-panel {
+      width: min(680px, 100%);
+      padding: clamp(24px, 5vw, 46px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 14, 18, 0.76);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(16px);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(36px, 7vw, 76px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 19px);
+      line-height: 1.7;
+    }
+
+    .primary,
+    .secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 160px;
+      min-height: 48px;
+      margin-right: 10px;
+      margin-top: 8px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 900;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+
+    .primary {
+      background: var(--gold);
+      color: #142026;
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .primary:hover,
+    .secondary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      .game {
+        min-height: 100vh;
+      }
+
+      .hud {
+        align-items: flex-start;
+      }
+
+      .chapter {
+        max-width: 44vw;
+      }
+
+      .stats {
+        max-width: 50vw;
+      }
+
+      .stat {
+        min-width: 72px;
+        padding: 8px;
+      }
+
+      .character-wrap {
+        inset: 82px 0 178px;
+      }
+
+      .character,
+      .character.close {
+        max-width: 86vw;
+        max-height: 62vh;
+      }
+
+      .character.left,
+      .character.right {
+        transform: translateX(0) scale(0.94);
+      }
+
+      .dialogue {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+      }
+
+      .speaker {
+        min-width: 112px;
+        padding: 9px 13px;
+      }
+
+      .text {
+        min-height: 116px;
+        padding: 14px 15px 10px;
+      }
+
+      .dialogue-footer {
+        padding: 0 13px 12px 15px;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+        padding: 0 12px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game" aria-label="侯家义的三幕奇遇">
+    <section class="menu" id="menu">
+      <div class="menu-panel">
+        <h1>侯家义的三幕奇遇</h1>
+        <p class="subtitle">一趟海边列车，一条空荡走廊，一片风很大的天台。今天，侯家义要把看似普通的一天，走成一段有点离谱、但认真发光的故事。</p>
+        <button class="primary" id="startBtn">开始游戏</button>
+        <button class="secondary" id="aboutBtn">玩法说明</button>
+      </div>
+    </section>
+
+    <div class="background" id="background"></div>
+    <div class="shade"></div>
+
+    <header class="hud" aria-label="游戏状态">
+      <div class="chapter" id="chapter">第一幕 海边列车</div>
+      <div class="stats">
+        <div class="stat">勇气 <strong id="courage">0</strong></div>
+        <div class="stat">灵感 <strong id="spark">0</strong></div>
+        <div class="stat">好感 <strong id="bond">0</strong></div>
+      </div>
+    </header>
+
+    <div class="character-wrap">
+      <img class="character" id="character" src="0b113f68e3becb26a5c850e9c0212297.jpg" alt="登场角色">
+    </div>
+
+    <section class="dialogue" id="dialogueBox">
+      <div class="speaker" id="speaker">旁白</div>
+      <div class="text" id="line">点击开始游戏。</div>
+      <div class="choices" id="choices"></div>
+      <div class="dialogue-footer">
+        <span id="hint">点击对话框或按空格继续</span>
+        <button class="next" id="nextBtn" title="继续" aria-label="继续">▶</button>
+      </div>
+    </section>
+
+    <section class="ending hidden" id="ending">
+      <div class="ending-panel">
+        <h1 id="endingTitle">今日结局</h1>
+        <p class="subtitle" id="endingText"></p>
+        <button class="primary" id="restartBtn">再玩一次</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const scenes = [
+      {
+        chapter: "第一幕 海边列车",
+        bg: "150029-1779001229315a.jpg",
+        portrait: "0b113f68e3becb26a5c850e9c0212297.jpg",
+        pose: "right",
+        lines: [
+          { speaker: "旁白", text: "海风从车窗外扑进来，侯家义看着闪闪发亮的海面，忽然觉得今天很适合发生点不普通的事。" },
+          { speaker: "神秘店长", text: "少年，我看你骨骼清奇，眼神里有三分迟到、七分想吃火锅。" },
+          { speaker: "侯家义", text: "这都能看出来？你是店长，还是列车上的预言家？" },
+          { speaker: "神秘店长", text: "都不是。我只是负责把迷路的人送到他们真正该去的地方。" },
+          {
+            speaker: "选择",
+            text: "列车即将到站。侯家义决定怎样回应？",
+            choices: [
+              { text: "认真追问目的地", add: { courage: 1, spark: 0, bond: 1 }, next: 4 },
+              { text: "先问火锅有没有优惠", add: { courage: 0, spark: 1, bond: 1 }, next: 4 }
+            ]
+          },
+          { speaker: "神秘店长", text: "不错。无论你选择理性还是食欲，都说明你还有救。下一站，学校走廊。" }
+        ]
+      },
+      {
+        chapter: "第二幕 走廊风波",
+        bg: "huaban-3489835171.jpg",
+        portrait: "72cfca2c16e54491104859bbcfbe2e13.jpg",
+        pose: "close",
+        lines: [
+          { speaker: "旁白", text: "空荡荡的走廊亮得像刚被擦过。侯家义刚踏进去，一个熟悉又过分靠近的声音突然响起。" },
+          { speaker: "贴脸同学", text: "侯家义！你终于来了！社团展示会还有十分钟，你的台词背了吗？" },
+          { speaker: "侯家义", text: "台词？我以为我今天只负责路过。" },
+          { speaker: "贴脸同学", text: "路过也是一种登场方式。来，给我一个能拯救全场的表情。" },
+          {
+            speaker: "选择",
+            text: "侯家义该如何准备登场？",
+            choices: [
+              { text: "摆出可靠主角脸", add: { courage: 1, spark: 0, bond: 1 }, next: 4 },
+              { text: "临场编一个海风传说", add: { courage: 0, spark: 2, bond: 0 }, next: 4 }
+            ]
+          },
+          { speaker: "贴脸同学", text: "很好！这种离谱但真诚的气势，正是我们社团缺少的东西。最后一站，去天台。" }
+        ]
+      },
+      {
+        chapter: "第三幕 天台告白",
+        bg: "huaban-4559047964.jpg",
+        portrait: "c1c67adb6ac92e1bb2dd04905c349eea.jpg",
+        pose: "left",
+        lines: [
+          { speaker: "旁白", text: "天台的天空蓝得像刚存档成功。侯家义推开门，看见戴着猫耳耳机的人正迎着风微笑。" },
+          { speaker: "猫耳前辈", text: "侯家义，你来了。听说你一路收集了勇气、灵感和好感。" },
+          { speaker: "侯家义", text: "听起来像游戏数值，但我确实感觉自己变强了一点。" },
+          { speaker: "猫耳前辈", text: "那就把今天的最后一句话说出来吧。要让风也记住。" },
+          {
+            speaker: "选择",
+            text: "侯家义站在天台中央，决定说：",
+            choices: [
+              { text: "我想把普通的一天认真过好", add: { courage: 1, spark: 0, bond: 2 }, next: 4 },
+              { text: "我要成立最强海风火锅社", add: { courage: 1, spark: 2, bond: 0 }, next: 4 }
+            ]
+          },
+          { speaker: "猫耳前辈", text: "合格。今天的侯家义，已经不是早上那个只会看窗外发呆的侯家义了。" },
+          { speaker: "旁白", text: "风从城市上空吹过，带走迟疑，也留下一个清清楚楚的新开始。" }
+        ]
+      }
+    ];
+
+    const state = {
+      scene: 0,
+      line: 0,
+      courage: 0,
+      spark: 0,
+      bond: 0,
+      waitingChoice: false
+    };
+
+    const menu = document.getElementById("menu");
+    const ending = document.getElementById("ending");
+    const background = document.getElementById("background");
+    const character = document.getElementById("character");
+    const chapter = document.getElementById("chapter");
+    const speaker = document.getElementById("speaker");
+    const line = document.getElementById("line");
+    const choices = document.getElementById("choices");
+    const hint = document.getElementById("hint");
+    const courage = document.getElementById("courage");
+    const spark = document.getElementById("spark");
+    const bond = document.getElementById("bond");
+
+    function updateStats() {
+      courage.textContent = state.courage;
+      spark.textContent = state.spark;
+      bond.textContent = state.bond;
+    }
+
+    function applyScene() {
+      const scene = scenes[state.scene];
+      background.style.setProperty("--bg", `url("${scene.bg}")`);
+      character.src = scene.portrait;
+      character.className = `character ${scene.pose}`;
+      chapter.textContent = scene.chapter;
+    }
+
+    function showLine() {
+      const scene = scenes[state.scene];
+      const item = scene.lines[state.line];
+      applyScene();
+      speaker.textContent = item.speaker;
+      line.textContent = item.text;
+      choices.innerHTML = "";
+      choices.style.display = item.choices ? "grid" : "none";
+      state.waitingChoice = Boolean(item.choices);
+      hint.textContent = item.choices ? "请选择一个回应" : "点击对话框或按空格继续";
+
+      if (item.choices) {
+        item.choices.forEach((choice) => {
+          const button = document.createElement("button");
+          button.className = "choice";
+          button.textContent = choice.text;
+          button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            state.courage += choice.add.courage;
+            state.spark += choice.add.spark;
+            state.bond += choice.add.bond;
+            state.waitingChoice = false;
+            state.line = choice.next + 1;
+            updateStats();
+            showLine();
+          });
+          choices.appendChild(button);
+        });
+      }
+    }
+
+    function nextLine() {
+      if (state.waitingChoice || !menu.classList.contains("hidden") || !ending.classList.contains("hidden")) {
+        return;
+      }
+
+      const scene = scenes[state.scene];
+      state.line += 1;
+
+      if (state.line >= scene.lines.length) {
+        state.scene += 1;
+        state.line = 0;
+      }
+
+      if (state.scene >= scenes.length) {
+        showEnding();
+        return;
+      }
+
+      showLine();
+    }
+
+    function showEnding() {
+      const total = state.courage + state.spark + state.bond;
+      const title = document.getElementById("endingTitle");
+      const text = document.getElementById("endingText");
+      let endingName = "稳稳发光结局";
+      let endingCopy = "侯家义没有把今天过成传奇大片，却把每一次选择都接住了。普通的一天，因为认真回应而变得值得纪念。";
+
+      if (state.spark >= state.courage && state.spark >= state.bond) {
+        endingName = "灵感暴走结局";
+        endingCopy = "侯家义的想象力一路狂奔，最后连天台的风都像在给他伴奏。传说中的海风火锅社，或许真的会成立。";
+      } else if (state.bond >= state.courage && state.bond >= state.spark) {
+        endingName = "人气主角结局";
+        endingCopy = "侯家义用真诚收获了大家的信任。下一次故事开始时，他身边一定不会缺少愿意同行的人。";
+      } else if (total >= 7) {
+        endingName = "全能主角结局";
+        endingCopy = "勇气、灵感和好感都被点亮。侯家义站在风里，忽然明白自己已经拥有开启下一章的资格。";
+      }
+
+      title.textContent = endingName;
+      text.textContent = `${endingCopy} 最终数值：勇气 ${state.courage}，灵感 ${state.spark}，好感 ${state.bond}。`;
+      ending.classList.remove("hidden");
+    }
+
+    function startGame() {
+      state.scene = 0;
+      state.line = 0;
+      state.courage = 0;
+      state.spark = 0;
+      state.bond = 0;
+      state.waitingChoice = false;
+      updateStats();
+      menu.classList.add("hidden");
+      ending.classList.add("hidden");
+      showLine();
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("nextBtn").addEventListener("click", nextLine);
+    document.getElementById("dialogueBox").addEventListener("click", nextLine);
+    document.getElementById("aboutBtn").addEventListener("click", () => {
+      alert("玩法：点击开始后推进对话，遇到选项时选择一个回应。不同选择会改变勇气、灵感和好感，并影响最终结局。");
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.code === "Space" || event.code === "Enter") {
+        event.preventDefault();
+        nextLine();
+      }
+    });
+
+    applyScene();
+    updateStats();
+  </script>
+</body>
+</html>
