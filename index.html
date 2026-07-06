@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>盛夏未命名</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="game" class="game">
+      <img id="bg" class="background" alt="" />
+      <div id="shade" class="shade"></div>
+
+      <section id="title-screen" class="title-screen">
+        <div class="title-copy">
+          <p class="kicker">Campus Romance Visual Novel</p>
+          <h1>盛夏未命名</h1>
+          <p>一个关于把话说出口、把心意放准方向的校园恋爱故事。</p>
+          <div class="title-actions">
+            <button id="start-btn" class="primary-button">开始游戏</button>
+            <button id="continue-btn" class="ghost-button">继续</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="hud" class="hud hidden">
+        <div class="topbar">
+          <div id="chapter" class="chapter">序章</div>
+          <div class="top-actions">
+            <button id="save-btn" title="保存">保存</button>
+            <button id="load-btn" title="读取">读取</button>
+            <button id="restart-btn" title="重开">重开</button>
+          </div>
+        </div>
+
+        <div id="sprites" class="sprites"></div>
+
+        <div id="choice-panel" class="choice-panel hidden"></div>
+
+        <article id="dialogue" class="dialogue">
+          <div id="speaker" class="speaker"></div>
+          <p id="line" class="line"></p>
+          <div class="dialogue-footer">
+            <span id="hint">点击画面继续</span>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
