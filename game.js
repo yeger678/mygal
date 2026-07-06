@@ -245,6 +245,19 @@ story.forEach((step, index) => {
   if (step.label) labels[step.label] = index;
 });
 
+function preloadImages() {
+  const urls = new Set(Object.values(backgrounds));
+  Object.values(characters).forEach((character) => {
+    character.sprites.forEach((sprite) => urls.add(asset(sprite)));
+  });
+
+  urls.forEach((url) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+  });
+}
+
 function sceneBg(key) {
   return backgrounds[key] || state.currentBg;
 }
@@ -396,3 +409,4 @@ els.restart.addEventListener("click", (event) => {
 els.game.addEventListener("click", continueStory);
 
 els.bg.src = backgrounds.classroom;
+preloadImages();
